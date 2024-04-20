@@ -1,0 +1,126 @@
+#ifndef LIGHTING_DEVICES_H
+#define LIGHTING_DEVICES_H
+
+#include "Patterns.h"
+
+enum class LightingDevicesType: int { // тип светового прибора
+    DeskLamp, //настольная лампа
+    WallLamp, //настенный светильник(ночник)
+    Chandelier, // люстра
+    FloorLamp, // торшер
+    Unknown = -1
+};
+
+enum class LightColor : int { //цвет светового источника
+    Red,
+    Green,
+    Blue,
+    White,
+    Unknown = -1
+};
+
+enum class ColorDevice : int { //цвет прибора
+    White,
+    Black,
+    Yellow,
+    Brown,
+    Unknown = -1
+};
+
+enum class Material : int {  //материал прибора
+    Tree,
+    Metal,
+    Plastic,
+    Unknown = -1
+};
+
+class LightingDevice
+{
+protected:
+    bool isOn; // Указывает, включено ли устройство
+    bool LightBrightness; // Представляет уровень яркости источника света
+    LightColor Color; // Цвет светового источника
+    LightingDevicesType Type; // Тип светового прибора
+    Material Material; // Материал прибора
+    ColorDevice DeviceColor; // Цвет прибора
+
+    LightingDevice();
+
+public:
+    bool IsOn() const { return isOn; } // Проверяет, включено ли устройство
+    bool GetLightBrightness() const { return LightBrightness; } // Проверяет уровень яркости источника света
+    virtual LightColor GetColor() const { return Color; } // Выводит цвет источника света
+    virtual LightingDevicesType GetType() const = 0; // выводит тип осветительного прибора
+    virtual Material GetMaterial() const = 0; // выводит материал прибора
+    virtual ColorDevice GetDeviceColor() const = 0; //выводит цвет прибора
+
+    // Методы для управления состоянием прибора
+    void TurnOn() { isOn = true; } // Включает прибор
+    void TurnOff() { isOn = false; } // Выключает прибор
+    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает уровень яркости света
+};
+
+typedef LightingDevice * LightingDevicePtr; // Указатель на осветительный прибор
+
+class DeskLamp : public LightingDevice
+{
+public:
+    DeskLamp() : LightingDevice() { Color = LightColor::Blue;
+                                    Type = LightingDevicesType::DeskLamp;
+                                    Material = Material::Tree;
+                                    DeviceColor = ColorDevice::Black;}
+    LightingDevicesType GetType() const { return Type; }
+    Material GetMaterial() const { return Material; }
+    ColorDevice GetDeviceColor() const { return DeviceColor; }
+    void TurnOn() { isOn = true; } // Включает лампу
+    void TurnOff() { isOn = false; } // Выключает лампу
+    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость лампы
+};
+
+class WallLamp : public LightingDevice
+{
+public:
+    WallLamp() : LightingDevice() { Color = LightColor::Green;
+                                    Type = LightingDevicesType::WallLamp;
+                                    Material = Material::Metal;
+                                    DeviceColor = ColorDevice::White;}
+    LightingDevicesType GetType() const { return Type; }
+    Material GetMaterial() const { return Material; }
+    ColorDevice GetDeviceColor() const { return DeviceColor; }
+    void TurnOn() { isOn = true; } // Включает лампу
+    void TurnOff() { isOn = false; } // Выключает лампу
+    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость лампы
+};
+
+class Chandelier : public LightingDevice
+{
+public:
+    Chandelier() : LightingDevice() { Color = LightColor::Red;
+                                      Type = LightingDevicesType::Chandelier;
+                                      Material = Material::Plastic;
+                                      DeviceColor = ColorDevice::Yellow;}
+    LightingDevicesType GetType() const { return Type; }
+    Material GetMaterial() const { return Material; }
+    ColorDevice GetDeviceColor() const { return DeviceColor; }
+    void TurnOn() { isOn = true; } // Включает люстру
+    void TurnOff() { isOn = false; } // Выключает люстру
+    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость люстры
+};
+
+class FloorLamp : public LightingDevice
+{
+public:
+    FloorLamp() : LightingDevice() { Color = LightColor::White;
+                                     Type = LightingDevicesType::FloorLamp;
+                                     Material = Material::Metal;
+                                     DeviceColor = ColorDevice::Brown;}
+    LightingDevicesType GetType() const { return Type; }
+    Material GetMaterial() const { return Material; }
+    ColorDevice GetDeviceColor() const { return DeviceColor; }
+    void TurnOn() { isOn = true; } // Включает торшер
+    void TurnOff() { isOn = false; } // Выключает торшер
+    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость торшера
+};
+
+#endif LIGHTING_DEVICES_H
+
