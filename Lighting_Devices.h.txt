@@ -2,6 +2,10 @@
 #define LIGHTING_DEVICES_H
 
 #include "Patterns.h"
+#include <vector>
+#include <list>
+
+using namespace std;
 
 enum class LightingDevicesType: int { // тип светового прибора
     DeskLamp, //настольная лампа
@@ -87,8 +91,8 @@ public:
     LightingDevicesType GetType() const { return Type; }
     Material GetMaterial() const { return Material; }
     ColorDevice GetDeviceColor() const { return DeviceColor; }
-    void TurnOn() { isOn = true; } // Включает лампу
-    void TurnOff() { isOn = false; } // Выключает лампу
+    void TurnOn() { isOn = true; } // Включает ночник
+    void TurnOff() { isOn = false; } // Выключает ночник
     void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость лампы
 };
 
@@ -122,5 +126,32 @@ public:
     void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость торшера
 };
 
-#endif LIGHTING_DEVICES_H
 
+// создание контейнеров
+
+class LightingDeviceContainer
+{
+private:
+    LightingDevicePtr *LightingDeviceBox; // указатель на указатель на устройство освещения
+    int DeviceCount;
+    int MaxSize;
+
+public:
+    LightingDeviceContainer(int maxSize);
+    virtual ~LightingDeviceContainer();
+    void AddDevice(LightingDevicePtr newDevice);
+    int GetCount() const { return DeviceCount; }
+    LightingDevicePtr GetByIndex(int index) const { return LightingDeviceBox[index]; }
+};
+
+class MegaLightingDeviceContainer
+{
+private:
+    vector<LightingDevicePtr> LightingDeviceBox;
+
+public:
+    void AddDevice(LightingDevicePtr newDevice) { LightingDeviceBox.push_back(newDevice); }
+    int GetCount() const { return LightingDeviceBox.size(); }
+    LightingDevicePtr GetByIndex(int index) const { return LightingDeviceBox[index];
+};
+#endif LIGHTING_DEVICES_H
