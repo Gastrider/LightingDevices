@@ -42,7 +42,7 @@ class LightingDevice
 {
 protected:
     bool isOn; // Указывает, включено ли устройство
-    bool LightBrightness; // Представляет уровень яркости источника света
+    bool DevicesInstallation; // Указывает установлено ли устройство
     LightColor Color; // Цвет светового источника
     LightingDevicesType Type; // Тип светового прибора
     Material Material; // Материал прибора
@@ -52,19 +52,19 @@ protected:
 
 public:
     bool IsOn() const { return isOn; } // Проверяет, включено ли устройство
-    bool GetLightBrightness() const { return LightBrightness; } // Проверяет уровень яркости источника света
+    bool GetInstallation() const { return DevicesInstallation; } // Проверяет уровень яркости источника света
     virtual LightColor GetColor() const { return Color; } // Выводит цвет источника света
     virtual LightingDevicesType GetType() const = 0; // выводит тип осветительного прибора
     virtual Material GetMaterial() const = 0; // выводит материал прибора
     virtual ColorDevice GetDeviceColor() const = 0; //выводит цвет прибора
 
     // Методы для управления состоянием прибора
-    void TurnOn() { isOn = true; } // Включает прибор
-    void TurnOff() { isOn = false; } // Выключает прибор
-    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает уровень яркости света
+    virtual void TurnOn() { isOn = true; } // Включает прибор
+    virtual void TurnOff() { isOn = false; } // Выключает прибор
+    virtual void Installation() = 0;  // выводит можно ли установить устройство
 };
 
-typedef LightingDevice * LightingDevicePtr; // Указатель на осветительный прибор
+typedef LightingDevice *LightingDevicePtr; // Указатель на осветительный прибор
 
 class DeskLamp : public LightingDevice
 {
@@ -78,7 +78,7 @@ public:
     ColorDevice GetDeviceColor() const { return DeviceColor; }
     void TurnOn() { isOn = true; } // Включает лампу
     void TurnOff() { isOn = false; } // Выключает лампу
-    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость лампы
+    void Installation() { wcout << "Устанавливаем осветительный прибор" }
 };
 
 class WallLamp : public LightingDevice
@@ -93,7 +93,7 @@ public:
     ColorDevice GetDeviceColor() const { return DeviceColor; }
     void TurnOn() { isOn = true; } // Включает ночник
     void TurnOff() { isOn = false; } // Выключает ночник
-    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость лампы
+    void Installation() { wcout << "Устанавливаем осветительный прибор" }
 };
 
 class Chandelier : public LightingDevice
@@ -108,7 +108,7 @@ public:
     ColorDevice GetDeviceColor() const { return DeviceColor; }
     void TurnOn() { isOn = true; } // Включает люстру
     void TurnOff() { isOn = false; } // Выключает люстру
-    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость люстры
+    void Installation() { wcout << "Устанавливаем осветительный прибор" }
 };
 
 class FloorLamp : public LightingDevice
@@ -123,11 +123,32 @@ public:
     ColorDevice GetDeviceColor() const { return DeviceColor; }
     void TurnOn() { isOn = true; } // Включает торшер
     void TurnOff() { isOn = false; } // Выключает торшер
-    void SetBrightness(int brightness) { LightBrightness = brightness; } // Устанавливает яркость торшера
+    void Installation() { wcout << "Устанавливаем осветительный прибор" }
 };
 
-
 // создание контейнеров
+//итератор для 1 контейнера
+
+class LightingDeviceContainerIterator : public Iterator<LightingDevicePtr>
+{
+private:
+    const LightingDevicePtr *LightingDeviceBox; // Указатель на массив устройств освещения
+    int Pos; // Текущая позиция итератора
+    int Count; // Общее количество устройств освещения в контейнере
+
+public:
+    LightingDeviceContainerIterator(LightingDevicePtr *lightingDeviceBox, int count)
+    {
+        LightingDeviceBox = lightingDeviceBox;
+        Count = count;
+        Pos = 0;
+    }
+
+    void First() override { Pos = 0; }
+    void Next() override { Pos++; }
+    bool IsDone() const override { return Pos >= Count; }
+    LightingDevicePtr GetCurrent() const override { return LightingDeviceBox[Pos]; }
+};
 
 class LightingDeviceContainer
 {
@@ -141,17 +162,97 @@ public:
     virtual ~LightingDeviceContainer();
     void AddDevice(LightingDevicePtr newDevice);
     int GetCount() const { return DeviceCount; }
-    LightingDevicePtr GetByIndex(int index) const { return LightingDeviceBox[index]; }
+    //LightingDevicePtr GetByIndex(int index) const { return LightingDeviceBox[index]; }
+
+    Iterator<LightingDevicePtr>* CreateIterator() {
+        return new LightingDeviceContainerIterator(LightingDeviceBox, DeviceCount);
+    }
+};
+
+//итератор для 2 контейнера
+class MegaLightingDeviceContainerIterator : public Iterator<LightingDevicePtr>
+{
+private:
+    const list<LightingDevicePtr> *LightingDeviceBox;
+    list<LightingDevicePtr>::const_iterator it;
+
+public:
+    MegaLightingDeviceContainerIterator(const list<LightingDevicePtr> *lightingDeviceBox)
+    {
+        LightingDeviceBox = lightingDeviceBox;
+        it = LightingDeviceBox->begin();
+    }
+
+    void First() override { it = LightingDeviceBox->begin(); }
+    void Next() override { ++it; }
+    bool IsDone() const override { return it == LightingDeviceBox->end(); }
+    LightingDevicePtr GetCurrent() const override { return *it; }
 };
 
 class MegaLightingDeviceContainer
 {
 private:
-    vector<LightingDevicePtr> LightingDeviceBox;
+    //vector<LightingDevicePtr> LightingDeviceBox;
+    list<LightingDevicePtr>LightingDeviceBox;
 
 public:
     void AddDevice(LightingDevicePtr newDevice) { LightingDeviceBox.push_back(newDevice); }
     int GetCount() const { return LightingDeviceBox.size(); }
-    LightingDevicePtr GetByIndex(int index) const { return LightingDeviceBox[index];
+    //LightingDevicePtr GetByIndex(int index) const { return LightingDeviceBox[index];
+    Iterator<LightingDevicePtr>* CreateIterator() {
+        return new MegaLightingDeviceContainerIterator(&LightingDeviceBox);
+    }
+};
+
+//декораторы
+
+//Декоратор для фильтрации устройств освещения по типу
+
+class LightingDeviceTypeIteratorDecorator : public IteratorDecorator<LightingDevicePtr> {
+private:
+    LightingDevicesType targetType;
+
+public:
+    LightingDeviceTypeIteratorDecorator(Iterator<LightingDevicePtr> *it, LightingDevicesType type)
+    : IteratorDecorator<LightingDevicePtr>(it), targetType(type) {}
+
+    void Next() override {
+        do {
+            this->It->Next();
+        } while (!this->IsDone() && this->It->GetCurrent()->GetType() != targetType);
+    }
+};
+
+//Декоратор для итератора, который возвращает только установленные осветительные приборы
+
+class InstalledDevicesFilterIterator : public IteratorDecorator<LightingDevicePtr> {
+public:
+    InstalledDevicesFilterIterator(Iterator<LightingDevicePtr>* it) : IteratorDecorator<LightingDevicePtr>(it) {
+        // Пропускаем устройства, которые не установлены, до тех пор, пока не найдем установленное
+        while (!this->IsDone() && !static_cast<LightingDevice*>(this->GetCurrent())->GetInstallation()) {
+            this->Next();
+        }
+    }
+
+    void Next() override {
+        this->It->Next();
+        // Пропускаем устройства, которые не установлены
+        while (!this->IsDone() && !static_cast<LightingDevice*>(this->GetCurrent())->GetInstallation()) {
+            this->It->Next();
+        }
+    }
+};
+//Декоратор для итератора, который возвращает только включенные устройства освещения
+
+class OnStateFilterDecorator : public IteratorDecorator<LightingDevicePtr> {
+public:
+    OnStateFilterDecorator(Iterator<LightingDevicePtr>* it)
+    : IteratorDecorator<LightingDevicePtr>(it) {}
+
+    void Next() override {
+        do {
+            this->It->Next();
+        } while (!this->IsDone() && !static_cast<LightingDevice*>(this->It->GetCurrent())->IsOn());
+    }
 };
 #endif LIGHTING_DEVICES_H
